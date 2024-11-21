@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void exibirArmarios(unsigned char mapa) {
+    printf("Status dos armários:\n");
+    for (int i = 0; i < 8; i++) {
+        printf("Armário %d: %s\n", i + 1, (mapa & (1 << i)) ? "Ocupado" : "Livre");
+    }
+}
+
+int escolherArmarioAleatorio(unsigned char mapa) {
+    int armario = -1;
+    int tentativas = 0;
+
+    while (tentativas < 8) {
+        int posicao = rand() % 8;
+        if (!(mapa & (1 << posicao))) {
+            armario = posicao;
+            break;
+        }
+        tentativas++;
+    }
+
+    return armario;
+}
+
+void ocuparArmario(unsigned char *mapa) {
+    int armario = escolherArmarioAleatorio(*mapa);
+
+    if (armario == -1) {
+        printf("Todos os armários estão ocupados!\n");
+    } else {
+        *mapa |= (1 << armario);
+        printf("Armário %d foi ocupado.\n", armario + 1);
+    }
+}
+
+void liberarArmario(unsigned char *mapa) {
+    int armario;
+
+    printf("Informe o número do armário a ser liberado (1-8): ");
+    scanf("%d", &armario);
+
+    if (armario < 1 || armario > 8) {
+        printf("Número de armário inválido!\n");
+        return;
+    }
+
+    if (*mapa & (1 << (armario - 1))) {
+        *mapa &= ~(1 << (armario - 1));
+        printf("Armário %d foi liberado.\n", armario);
+    } else {
+        printf("Armário %d já está livre.\n", armario);
+    }
+}
+
+int main() {
+    unsigned char mapaArmarios = 0; // Todos os bits inicialmente 0 (todos livres)
+    int opcao;
+
+    srand(time(NULL)); // Inicializa o gerador de números aleatórios
+
+    do {
+        exibirArmarios(mapaArmarios);
+        printf("\nMenu:\n");
+        printf("1. Ocupar armário\n");
+        printf("2. Liberar armário\n");
+        printf("3. Sair\n");
+        printf("Escolha uma opção: ");
+        scanf("%d", &opcao);
+
+        switch (opcao) {
+            case 1:
+                ocuparArmario(&mapaArmarios);
+                break;
+            case 2:
+                liberarArmario(&mapaArmarios);
+                break;
+            case 3:
+                printf("Saindo...\n");
+                break;
+            default:
+                printf("Opção inválida!\n");
+        }
+    } while (opcao != 3);
+
+    return 0;
+}
